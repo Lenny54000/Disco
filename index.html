@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemple HTML CSS JavaScript</title>
+    <style>
+        /* Styles CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenue sur ma page</h1>
+        <div class="button-container">
+            <button id="changeColorBtn">Changer la couleur</button>
+            <button id="autoChangeBtn">Activer le changement automatique</button>
+        </div>
+    </div>
+
+    <!-- Ajout de l'élément audio pour le fichier "song.mp3" -->
+    <audio id="audio" src="song.mp3"></audio>
+
+    <script>
+        // JavaScript
+        var autoChangeInterval;
+        var audio = document.getElementById('audio');
+        var isAutoChangeEnabled = false;
+        var audioTimeout; // Pour gérer le délai d'arrêt de l'audio
+        var audioResumePosition = 0; // Pour sauvegarder la position de reprise de l'audio
+
+        document.getElementById('changeColorBtn').addEventListener('click', function() {
+            if (!isAutoChangeEnabled) {
+                changeBackgroundColor();
+                playAudioForDuration(500); // Joue l'audio pendant 500 millisecondes
+            }
+        });
+
+        document.getElementById('autoChangeBtn').addEventListener('click', function() {
+            if (!isAutoChangeEnabled) {
+                startAutoChange();
+            } else {
+                stopAutoChange();
+            }
+        });
+
+        function startAutoChange() {
+            isAutoChangeEnabled = true;
+            autoChangeInterval = setInterval(function() {
+                changeBackgroundColor();
+                if (!isAudioPlaying()) {
+                    playAudio();
+                }
+            }, 500); // Changement toutes les 500 millisecondes (0.5 seconde)
+            document.getElementById('autoChangeBtn').textContent = 'Désactiver le changement automatique';
+        }
+
+        function stopAutoChange() {
+            isAutoChangeEnabled = false;
+            clearInterval(autoChangeInterval);
+            document.getElementById('autoChangeBtn').textContent = 'Activer le changement automatique';
+            pauseAudio(); // Pause l'audio lorsque le changement automatique est désactivé
+        }
+
+        function changeBackgroundColor() {
+            var body = document.querySelector('body');
+            body.style.backgroundColor = getRandomColor();
+        }
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function playAudioForDuration(duration) {
+            if (!isAutoChangeEnabled && !isAudioPlaying()) {
+                playAudio();
+                audioTimeout = setTimeout(function() {
+                    pauseAudio();
+                }, duration);
+            }
+        }
+
+        function playAudio() {
+            audio.currentTime = audioResumePosition; // Reprend l'audio à partir de la position sauvegardée
+            audio.play();
+        }
+
+        function pauseAudio() {
+            audio.pause();
+            audioResumePosition = audio.currentTime; // Sauvegarde la position de lecture actuelle
+            clearTimeout(audioTimeout); // Efface le délai de pause
+        }
+
+        function isAudioPlaying() {
+            return !audio.paused;
+        }
+    </script>
+</body>
+</html>
